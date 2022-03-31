@@ -1,0 +1,6 @@
+# deno build
+bin
+tmp
+
+# bootstrap cache
+tools/tmp*
