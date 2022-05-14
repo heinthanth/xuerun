@@ -6,7 +6,7 @@ eta.configure
     parse: { exec: "#", raw: "%", interpolate: "" }
 
 # magic happens here
-export runRecipe = (rc, recipe, options, recon, asIngredient) ->
+export runRecipe = (rc, cwd, recipe, options, recon, asIngredient) ->
     if not (rc.hasOwnProperty(recipe))
         console.error("\nxuerun: oops, recipe '#{recipe}' is not in .xuerun tasks!\n")
         Deno.exit(1)
@@ -33,9 +33,10 @@ export runRecipe = (rc, recipe, options, recon, asIngredient) ->
     dependencies = if typeof currentRecipe.dependencies ==
         "string" then currentRecipe.dependencies.split(" ") else currentRecipe.dependencies
 
+    usedCwd = currentRecipe.cwd or cwd
     dependencies.forEach (dep) ->
         # won't pass options
-        if typeof dep == "string" then return runRecipe(rc, dep, {})
+        if typeof dep == "string" then return runRecipe(rc, usedCwd, dep, {})
 
         depOption = { ...dep.options }
         if typeof dep.passParentOptions == "boolean" and dep.passParentOptions
@@ -53,7 +54,7 @@ export runRecipe = (rc, recipe, options, recon, asIngredient) ->
                 console.error("\nxuerun: oops, something went wrong while reading options.\nError:",
                     err.message, "\n")
                 Deno.exit(1)
-        runRecipe(rc, dep.name, depOptionToBePassed, recon, true)
+        runRecipe(rc, usedCwd, dep.name, depOptionToBePassed, recon, true)
 
     # make main recipe
     commands = currentRecipe.command
@@ -93,6 +94,7 @@ export runRecipe = (rc, recipe, options, recon, asIngredient) ->
                 stderr: "inherit"
                 clearEnv: true
                 env: preparedEnv
+                cwd: usedCwd
         catch err
             console.error("\nxuerun: Something went wrong while running command", commandToRun)
             console.error("Error:", err.message, "\n")

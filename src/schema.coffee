@@ -14,6 +14,7 @@ getCurrentSH = -> if Deno.build.os == "windows" then "cmd" else "sh"
 XueRunRecipe$dependencies = union([string(), array(union([string(), XueRunIngredient]))])
 export XueRunRecipe = object
     description: defaulted(optional(string()), () => ""),
+    cwd: defaulted(optional(string()), () => Deno.cwd()),
     shell: defaulted(optional(string()), () => Deno.env.get("SHELL") || getCurrentSH()),
     command: defaulted(optional(union([string(), array(XueRunUserCmd)])), () => ""),
     passEnv: defaulted(optional(union([boolean(), array(string())])), () => !1),
