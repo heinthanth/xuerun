@@ -23,5 +23,5 @@ cmd = ["deno", "compile", "--allow-read", "--allow-write",
 p = Deno.run({ cmd })
 
 processStatus = await p.status()
-await Deno.remove(distPath, { recursive: true });
+# await Deno.remove(distPath, { recursive: true });
 (processStatus.code != 0) and Deno.exit(processStatus.code);

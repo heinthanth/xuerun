@@ -34,9 +34,9 @@ export runRecipe = (rc, cwd, recipe, options, recon, asIngredient) ->
         "string" then currentRecipe.dependencies.split(" ") else currentRecipe.dependencies
 
     usedCwd = currentRecipe.cwd or cwd
-    dependencies.forEach (dep) ->
+    for dep in dependencies
         # won't pass options
-        if typeof dep == "string" then return runRecipe(rc, usedCwd, dep, {})
+        if typeof dep == "string" then await runRecipe(rc, usedCwd, dep, {}); break
 
         depOption = { ...dep.options }
         if typeof dep.passParentOptions == "boolean" and dep.passParentOptions
@@ -54,21 +54,21 @@ export runRecipe = (rc, cwd, recipe, options, recon, asIngredient) ->
                 console.error("\nxuerun: oops, something went wrong while reading options.\nError:",
                     err.message, "\n")
                 Deno.exit(1)
-        runRecipe(rc, usedCwd, dep.name, depOptionToBePassed, recon, true)
+        await runRecipe(rc, usedCwd, dep.name, depOptionToBePassed, recon, true)
 
     # make main recipe
-    commands = currentRecipe.command
-    (if typeof commands == "string" then [commands] else commands)
-    .map (cmdOption) ->
-        try
-            if typeof cmdOption == "string" then return eta.render(cmdOption, currentOption)
-            else return {...cmdOption, cmd: eta.render(cmdOption.cmd, currentOption)}
-        catch err
-            console.error(
-                "\nxuerun: oops, something went wrong while reading command.\nError:",
-                err.message, "\n")
-            Deno.exit(1)
-    .forEach (cmdOption) ->
+    _commands = currentRecipe.command
+    commands = (if typeof _commands == "string" then [_commands] else _commands)
+        .map (cmdOption) ->
+            try
+                if typeof cmdOption == "string" then return eta.render(cmdOption, currentOption)
+                else return {...cmdOption, cmd: eta.render(cmdOption.cmd, currentOption)}
+            catch err
+                console.error(
+                    "\nxuerun: oops, something went wrong while reading command.\nError:",
+                    err.message, "\n")
+                Deno.exit(1)
+    for cmdOption in commands
         commandToRun = [
             (if typeof cmdOption == "object" and
                 cmdOption.shell then cmdOption.shell else currentRecipe.shell), "-c",
@@ -87,7 +87,7 @@ export runRecipe = (rc, cwd, recipe, options, recon, asIngredient) ->
 
         commandProcess = null
         try
-            commandProcess = Deno.run
+            commandProcess = await Deno.run
                 cmd: commandToRun
                 stdin: "inherit"
                 stdout: "inherit"

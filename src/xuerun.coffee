@@ -90,7 +90,7 @@ programMain = () ->
         if xueRunRc.hasOwnProperty("all")
             return runRecipe(xueRunRc, null, recipes, userOption)
         else console.error("\nxuerun: oops, no recipe given, nothing to do!\n"); Deno.exit(1)
-    recipes.forEach (recipe) -> runRecipe(xueRunRc, null, recipe, options, recon, !1)
+    recipes.forEach (recipe) -> await runRecipe(xueRunRc, null, recipe, options, recon, !1)
 
 # call main function
 if import.meta.main then programMain()
