@@ -39,7 +39,7 @@ export runRecipe = (rc, recipe, options, recon, asIngredient) ->
 
     for dep in dependencies
         # won't pass options
-        if typeof dep == "string" then await runRecipe(rc, dep, {}, recon, true); break
+        if typeof dep == "string" then await runRecipe(rc, dep, {}, recon, true); continue
 
         depOption = { ...dep.options }
         if typeof dep.passParentOptions == "boolean" and dep.passParentOptions
@@ -63,18 +63,18 @@ export runRecipe = (rc, recipe, options, recon, asIngredient) ->
     Deno.chdir(usedCwd)
     # make main recipe
     _commands = currentRecipe.command
-    commands = (if typeof _commands == "string" then [_commands] else _commands)
-        .map (cmdOption) ->
-            try
-                if typeof cmdOption == "string" then return eta.render(cmdOption, currentOption)
-                else return {...cmdOption, cmd: eta.render(cmdOption.cmd, currentOption)}
-            catch err
-                console.error(
-                    "\nxuerun: oops, something went wrong while reading command.\nError:",
-                    err.message, "\n")
-                Deno.exit(1)
 
-    for cmdOption in commands
+    for _cmdOption in (if typeof _commands == "string" then [_commands] else _commands)
+        try
+            if typeof _cmdOption == "string"
+                cmdOption = eta.render(_cmdOption, currentOption)
+            else cmdOption = {..._cmdOption, cmd: eta.render(_cmdOption.cmd, currentOption)}
+        catch err
+            console.error(
+                "\nxuerun: oops, something went wrong while reading command.\nError:",
+                err.message, "\n")
+            Deno.exit(1)
+
         # used by eval
         opt = currentOption
         # don't run if eval when is false

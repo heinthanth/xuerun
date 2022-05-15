@@ -92,7 +92,7 @@ programMain = () ->
 
     if recipes.length == 0
         if xueRunRc.hasOwnProperty("all")
-            return runRecipe(xueRunRc, null, recipes, userOption)
+            return runRecipe(xueRunRc, "all", options, recon, !1)
         else console.error("\nxuerun: oops, no recipe given, nothing to do!\n"); Deno.exit(1)
     recipes.forEach (recipe) -> await runRecipe(xueRunRc, recipe, options, recon, !1)
 
