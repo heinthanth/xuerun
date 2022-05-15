@@ -18,10 +18,16 @@ Array(...walkSync(srcPath)).forEach (p) ->
     compiledCode = compile(content, { bare: true }).replace(/\.coffee/g, ".js")
     Deno.writeTextFileSync(format({ ...d, ext: ".js" }), compiledCode)
 
-cmd = ["deno", "compile", "--allow-read", "--allow-write",
-    "--allow-env", "--allow-run", "--unstable", "--output", binPath, mainMod]
-p = Deno.run({ cmd })
+for target in ["x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc", "x86_64-apple-darwin", "aarch64-apple-darwin"]
+    cmd = ["deno", "compile", "--allow-read", "--allow-write", "--allow-env",
+        "--allow-run", "--unstable", "--target", target, "--output", "#{binPath}-#{target}", mainMod]
+    p = Deno.run({ cmd })
+    processStatus = await p.status()
 
+# bundle to JS
+cmd = ["deno", "bundle", "--unstable", mainMod, "#{binPath}.js"]
+p = Deno.run({ cmd })
 processStatus = await p.status()
-# await Deno.remove(distPath, { recursive: true });
+
+await Deno.remove(distPath, { recursive: true });
 (processStatus.code != 0) and Deno.exit(processStatus.code);
