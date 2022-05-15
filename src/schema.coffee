@@ -2,8 +2,12 @@ import { create, defaulted, optional, union, object, record,
     array, string, number, boolean, validate } from "https://esm.sh/superstruct";
 
 # use eval?
-XueRunUserCmd = union([string(), object({ shell: optional(string()), cmd: string(),
-    'when': defaulted(union([string(), number(), boolean()]), () => 'true') })]);
+XueRunUserCmd = union([
+    string(),
+    object({
+        shell: optional(string()),
+        cmd: string(),
+        'when': defaulted(optional(union([string(), number(), boolean()])), () => 'true') }) ]);
 
 XueRunIngredient$option = union([string(), number(), boolean()])
 export XueRunIngredient = object
