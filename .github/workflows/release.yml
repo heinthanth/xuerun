@@ -24,8 +24,8 @@ jobs:
         with:
           body_path: MESSAGE.txt
           files: |
-            xuerun.js
-            xuerun-x86_64-pc-windows-msvc.exe
-            xuerun-aarch64-apple-darwin
-            xuerun-x86_64-unknown-linux-gnu
-            xuerun-x86_64-apple-darwin
+            ./bin/xuerun.js
+            ./bin/xuerun-x86_64-pc-windows-msvc.exe
+            ./bin/xuerun-aarch64-apple-darwin
+            ./bin/xuerun-x86_64-unknown-linux-gnu
+            ./bin/xuerun-x86_64-apple-darwin
