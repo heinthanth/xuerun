@@ -5,6 +5,7 @@ Just a make-like task runner but with more power! It's written in CoffeeScript +
 ## Downloads
 
 Go to Release page and download builds!
+And move it to your path. Eg. `/usr/bin`, `/usr/local/bin`, etc. For windows, the same :P.
 
 ## How to Build
 
