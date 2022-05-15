@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write --allow-run --allow-env
 
 import { compile } from "https://esm.sh/coffeescript";
-import { join, parse, format } from "https://deno.land/std@0.132.0/path/mod.ts";
+import { join, parse, format } from "https://deno.land/std@0.139.0/path/mod.ts";
 
 const __dirname = new URL(".", import.meta.url).pathname;
 const compiler = join(__dirname, "build.coffee");

@@ -1,12 +1,14 @@
 import * as eta from "https://deno.land/x/eta@v1.12.3/mod.ts"
+import { resolve } from "https://deno.land/std@0.139.0/path/mod.ts";
 
 eta.configure
     tags: ["{{", "}}"]
-    useWith: true
+    varName: "opt"
     parse: { exec: "#", raw: "%", interpolate: "" }
 
 # magic happens here
-export runRecipe = (rc, cwd, recipe, options, recon, asIngredient) ->
+export runRecipe = (rc, recipe, options, recon, asIngredient) ->
+    previousCwd = Deno.cwd()
     if not (rc.hasOwnProperty(recipe))
         console.error("\nxuerun: oops, recipe '#{recipe}' is not in .xuerun tasks!\n")
         Deno.exit(1)
@@ -33,10 +35,11 @@ export runRecipe = (rc, cwd, recipe, options, recon, asIngredient) ->
     dependencies = if typeof currentRecipe.dependencies ==
         "string" then currentRecipe.dependencies.split(" ") else currentRecipe.dependencies
 
-    usedCwd = currentRecipe.cwd or cwd
+    usedCwd = currentRecipe.cwd and resolve(Deno.cwd(), currentRecipe.cwd) or Deno.cwd()
+
     for dep in dependencies
         # won't pass options
-        if typeof dep == "string" then await runRecipe(rc, usedCwd, dep, {}); break
+        if typeof dep == "string" then await runRecipe(rc, dep, {}, recon, true); break
 
         depOption = { ...dep.options }
         if typeof dep.passParentOptions == "boolean" and dep.passParentOptions
@@ -54,8 +57,10 @@ export runRecipe = (rc, cwd, recipe, options, recon, asIngredient) ->
                 console.error("\nxuerun: oops, something went wrong while reading options.\nError:",
                     err.message, "\n")
                 Deno.exit(1)
-        await runRecipe(rc, usedCwd, dep.name, depOptionToBePassed, recon, true)
+        await runRecipe(rc, dep.name, depOptionToBePassed, recon, true)
 
+    # change to given cwd for Deno process
+    Deno.chdir(usedCwd)
     # make main recipe
     _commands = currentRecipe.command
     commands = (if typeof _commands == "string" then [_commands] else _commands)
@@ -68,14 +73,20 @@ export runRecipe = (rc, cwd, recipe, options, recon, asIngredient) ->
                     "\nxuerun: oops, something went wrong while reading command.\nError:",
                     err.message, "\n")
                 Deno.exit(1)
+
     for cmdOption in commands
+        # used by eval
+        opt = currentOption
+        # don't run if eval when is false
+        if typeof cmdOption == "object" and not Boolean(eval(cmdOption.when)) then continue
+
         commandToRun = [
             (if typeof cmdOption == "object" and
                 cmdOption.shell then cmdOption.shell else currentRecipe.shell), "-c",
             if typeof cmdOption == "string" then cmdOption else cmdOption.cmd ]
 
         # if recon, just show command
-        if recon then return console.info(commandToRun)
+        if recon then console.info(commandToRun); continue
 
         # run command
         preparedEnv = {}
@@ -104,3 +115,5 @@ export runRecipe = (rc, cwd, recipe, options, recon, asIngredient) ->
         if status.code != 0
             console.error("\nxuerun: command exit with exit code:", status.code, "\n")
             Deno.exit(status.code)
+    # back to previous cwd ( root of project )
+    Deno.chdir(previousCwd)

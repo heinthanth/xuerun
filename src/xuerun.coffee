@@ -1,7 +1,8 @@
-import { parse } from "https://deno.land/std@0.132.0/flags/mod.ts";
-import { parse as parseYAML } from "https://deno.land/std@0.132.0/encoding/yaml.ts"
-import { YAMLError } from "https://deno.land/std@0.132.0/encoding/_yaml/error.ts"
-import { printf } from "https://deno.land/std@0.132.0/fmt/printf.ts"
+import { parse } from "https://deno.land/std@0.139.0/flags/mod.ts";
+import { parse as parseYAML } from "https://deno.land/std@0.139.0/encoding/yaml.ts"
+import { YAMLError } from "https://deno.land/std@0.139.0/encoding/_yaml/error.ts"
+import { dirname, resolve } from "https://deno.land/std@0.139.0/path/mod.ts";
+import { printf } from "https://deno.land/std@0.139.0/fmt/printf.ts"
 import { StructError } from "https://esm.sh/superstruct"
 import { runRecipe } from "./core.coffee"
 import createConfiguration from "./schema.coffee"
@@ -86,11 +87,14 @@ programMain = () ->
 
     # load and run
     xueRunRc = loadXueRunTasks(tasksPath)
+    # change dir to task path dir.
+    Deno.chdir(dirname(resolve(tasksPath)))
+
     if recipes.length == 0
         if xueRunRc.hasOwnProperty("all")
             return runRecipe(xueRunRc, null, recipes, userOption)
         else console.error("\nxuerun: oops, no recipe given, nothing to do!\n"); Deno.exit(1)
-    recipes.forEach (recipe) -> await runRecipe(xueRunRc, null, recipe, options, recon, !1)
+    recipes.forEach (recipe) -> await runRecipe(xueRunRc, recipe, options, recon, !1)
 
 # call main function
 if import.meta.main then programMain()

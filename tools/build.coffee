@@ -1,6 +1,6 @@
 import { compile } from "https://esm.sh/coffeescript"
-import { walkSync, ensureDirSync, emptyDir } from "https://deno.land/std@0.132.0/fs/mod.ts"
-import { join, parse, format } from "https://deno.land/std@0.132.0/path/mod.ts"
+import { walkSync, ensureDirSync, emptyDir } from "https://deno.land/std@0.139.0/fs/mod.ts"
+import { join, parse, format } from "https://deno.land/std@0.139.0/path/mod.ts"
 
 __dirname = new URL(".", import.meta.url).pathname
 srcPath = join(__dirname, "..", "src")

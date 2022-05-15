@@ -1,7 +1,9 @@
 import { create, defaulted, optional, union, object, record,
     array, string, number, boolean, validate } from "https://esm.sh/superstruct";
 
-XueRunUserCmd = union([string(), object({ shell: optional(string()), cmd: string() })]);
+# use eval?
+XueRunUserCmd = union([string(), object({ shell: optional(string()), cmd: string(),
+    'when': defaulted(union([string(), number(), boolean()]), () => 'true') })]);
 
 XueRunIngredient$option = union([string(), number(), boolean()])
 export XueRunIngredient = object
@@ -14,7 +16,7 @@ getCurrentSH = -> if Deno.build.os == "windows" then "cmd" else "sh"
 XueRunRecipe$dependencies = union([string(), array(union([string(), XueRunIngredient]))])
 export XueRunRecipe = object
     description: defaulted(optional(string()), () => ""),
-    cwd: defaulted(optional(string()), () => Deno.cwd()),
+    cwd: optional(string()),
     shell: defaulted(optional(string()), () => Deno.env.get("SHELL") || getCurrentSH()),
     command: defaulted(optional(union([string(), array(XueRunUserCmd)])), () => ""),
     passEnv: defaulted(optional(union([boolean(), array(string())])), () => !1),
