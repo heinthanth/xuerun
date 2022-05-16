@@ -29,7 +29,7 @@ printVersion = () ->
         ' /  y88b  888  888 y888    , 888_-~   888  888 888  888'
         '/    y88b "88_-888  "88___/  888 ~-_  "88_-888 888  888'].join("\n")
     console.info("%s\n", ascii)
-    printf("XueRun v%s ( %s / %s )\n", "0.1.0", Deno.build.os, Deno.build.arch)
+    printf("XueRun v%s ( %s / %s )\n", "1.0.0", Deno.build.os, Deno.build.arch)
     currentYear = new Date().getFullYear()
     printf("(c) 2022%s Hein Thant Maung Maung. Licensed under BSD-2-CLAUSE.\n\n",
         if currentYear == 2022 then "" else " - #{currentYear}")
