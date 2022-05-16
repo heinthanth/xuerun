@@ -19,6 +19,7 @@ jobs:
         run: |
           deno run --allow-read --allow-write --allow-run --allow-env ./tools/bootstrap.ts
           lipo -create -output ./bin/xuerun-universal-apple-darwin ./bin/xuerun-aarch64-apple-darwin ./bin/xuerun-x86_64-apple-darwin
+          chmod +x ./bin/xuerun-*
       - name: Generate Message
         run: echo "$(git log -1 --pretty=%s | /bin/cat)" > MESSAGE.txt
       - name: Release Build
