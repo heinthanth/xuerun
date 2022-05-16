@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-12
     steps:
       - name: Clone codes
         uses: actions/checkout@v2
@@ -16,7 +16,9 @@ jobs:
         with:
           deno-version: v1.x
       - name: Cross-compile XueRun with Deno
-        run: deno run --allow-read --allow-write --allow-run --allow-env ./tools/bootstrap.ts
+        run: |
+          deno run --allow-read --allow-write --allow-run --allow-env ./tools/bootstrap.ts
+          lipo -create -output ./bin/xuerun-universal-apple-darwin ./bin/xuerun-aarch64-apple-darwin ./bin/xuerun-x86_64-apple-darwin
       - name: Generate Message
         run: echo "$(git log -1 --pretty=%s | /bin/cat)" > MESSAGE.txt
       - name: Release Build
@@ -27,5 +29,6 @@ jobs:
             ./bin/xuerun.js
             ./bin/xuerun-x86_64-pc-windows-msvc.exe
             ./bin/xuerun-aarch64-apple-darwin
+            ./bin/xuerun-universal-apple-darwin
             ./bin/xuerun-x86_64-unknown-linux-gnu
             ./bin/xuerun-x86_64-apple-darwin
