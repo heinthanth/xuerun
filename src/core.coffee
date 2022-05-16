@@ -76,9 +76,12 @@ export runRecipe = (rc, recipe, options, recon, asIngredient) ->
             Deno.exit(1)
 
         # used by eval
-        opt = currentOption
+        globalThis.opt = currentOption
         # don't run if eval when is false
-        if typeof cmdOption == "object" and not Boolean(eval(cmdOption.when)) then continue
+        if typeof cmdOption == "object" and not Boolean(eval(cmdOption.when))
+            continue
+        # I don't need here
+        delete globalThis.opt
 
         commandToRun = [
             (if typeof cmdOption == "object" and

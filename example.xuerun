@@ -6,7 +6,7 @@ dependOnMeToo:
     when: opt.release # if opt.release is true
   - cmd: echo "Since passParentOptions is true in 'dependOnMe' task"
     when: opt.release # if opt.release is true
-  passEnv: [ PATH ] # u need to pass env to use ur PATH.
+  passEnv: [ PATH ] # u need to pass env to use ur PATH. Pass true to pass all environment variables
 dependOnMe:
   description: some task
   # cwd: / # try change cwd and see {{ Deno.cwd() }} output!
